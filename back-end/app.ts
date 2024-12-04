@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes'
 import productRoutes from './routes/productRoutes'
+import authRoutes from './routes/authRoutes'
 import cors from 'cors';
 
 dotenv.config();
@@ -24,6 +25,7 @@ mongoose
   .catch((err) => console.log(err));
 
 // Routes
+app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes) 
 

@@ -3,17 +3,31 @@ import Product from '../models/Product';
 
 const router = express.Router();
 
-// Get all products
+// GET: Get all products
 router.get('/', async (req: Request, res: Response) => {
   try {
     const products = await Product.find();
     res.status(200).send(products);
   } catch (error) {
-    res.status(500).send({ message: 'Error retrieving products', error });
+    res.status(500).send({ message: 'Internal Server Error', error });
   }
 });
 
-// Add new product
+// GET: Get product by id
+router.get('/:id', async (req: Request, res: Response): Promise<any> => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).send({ message: 'Product not found' });
+    }
+    res.status(200).send(product);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: 'Internal Server Error', error });
+  }
+});
+
+// POST: Add new product
 router.post('/', async (req: Request, res: Response) => {
   try {
     const product = new Product(req.body);
@@ -24,7 +38,7 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
-// Update product
+// PUT: Update product
 router.put('/:id', async (req: Request, res: Response): Promise<any> => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -41,7 +55,7 @@ router.put('/:id', async (req: Request, res: Response): Promise<any> => {
   }
 });
 
-// Delete a product
+// DELETE: Delete a product
 router.delete('/:id', async (req: Request, res: Response): Promise<any> => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
@@ -50,7 +64,7 @@ router.delete('/:id', async (req: Request, res: Response): Promise<any> => {
     }
     res.send({ message: 'Product deleted successfully', product });
   } catch (error) {
-    res.status(500).send({ message: 'Error deleting product', error });
+    res.status(500).send({ message: 'Internal server error', error });
   }
 });
 

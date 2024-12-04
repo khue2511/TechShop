@@ -1,10 +1,11 @@
 import express, { Request, Response } from 'express';
 import Product from '../models/Product';
+import { authenticateToken } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
 // GET: Get all products
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', authenticateToken, async (req: Request, res: Response) => {
   try {
     const products = await Product.find();
     res.status(200).send(products);
@@ -67,5 +68,5 @@ router.delete('/:id', async (req: Request, res: Response): Promise<any> => {
     res.status(500).send({ message: 'Internal server error', error });
   }
 });
-
+ 
 export default router;

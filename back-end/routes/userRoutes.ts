@@ -29,18 +29,35 @@ router.get('/:id', async (req: Request, res: Response): Promise<any> => {
   }
 });
 
-// DELETE: Delete a specific user
-// router.delete('/:id', async (req: Request, res: Response): Promise<any> => {
+// PUT: Update a specific's user details
+// router.put('/:id', async (req: Request, res: Response): Promise<any> => {
 //   try {
-//     const deletedUser = await User.findByIdAndDelete(req.params.id);
-
-//     if (!deletedUser) {
+//     const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+//       new: true,
+//     });
+//     if (!updatedUser) {
 //       return res.status(404).send({ message: 'User not found' });
 //     }
-//     res.send({ message: 'User deleted successfully', deletedUser });
+
+//     res.send({ message: 'User updated!', updatedUser });
 //   } catch (error) {
+//     console.log(error);
 //     res.status(500).send({ message: 'Internal server error', error });
 //   }
 // });
+
+// DELETE: Delete a specific user
+router.delete('/:id', async (req: Request, res: Response): Promise<any> => {
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
+
+    if (!deletedUser) {
+      return res.status(404).send({ message: 'User not found' });
+    }
+    res.send({ message: 'User deleted successfully', deletedUser });
+  } catch (error) {
+    res.status(500).send({ message: 'Internal server error', error });
+  }
+});
 
 export default router;

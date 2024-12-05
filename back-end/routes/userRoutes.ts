@@ -1,42 +1,14 @@
 import express, { Request, Response } from 'express';
-import User from '../models/User';
 import { authenticateToken } from '../middleware/authMiddleware';
+import { getAllUsers, getUserProfile } from '../controllers/userControllers';
 
 const router = express.Router();
 
 // GET: Return all users
-router.get('/', async (req: Request, res: Response) => {
-  try {
-    const users = await User.find();
-    res.status(200).send(users);
-  } catch (error) {
-    res.status(500).send({ message: 'Internal server error', error });
-  }
-});
+router.get('/', getAllUsers);
 
 // GET: Get a specific user profile
-router.get(
-  '/:id',
-  authenticateToken,
-  async (req: Request, res: Response): Promise<any> => {
-    try {
-      const userId = req.params.id;
-      if (req.user?.id !== userId) {
-        return res.status(403).json({ message: 'Unauthorized access' });
-      }
-
-      const user = await User.findById(userId);
-
-      if (!user) {
-        return res.status(404).send({ message: 'User not found' });
-      }
-      res.status(200).send({ username: user.username, email: user.email });
-    } catch (error) {
-      console.log(error);
-      res.status(500).send({ message: 'Internal server error', error });
-    }
-  },
-);
+router.get('/:id', authenticateToken, getUserProfile);
 
 // PUT: Update a specific's user details
 // router.put('/:id', async (req: Request, res: Response): Promise<any> => {

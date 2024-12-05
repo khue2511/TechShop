@@ -24,9 +24,14 @@ const OrderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  totalQuantity: {
+    type: Number,
+    required: true,
+  },
   status: {
     type: String,
     required: true,
+    default: 'pending',
   },
 });
 

@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes'
 import productRoutes from './routes/productRoutes'
 import authRoutes from './routes/authRoutes'
+import cartRoutes from './routes/cartRoutes'
 import cors from 'cors';
 
 dotenv.config();
@@ -27,6 +28,7 @@ mongoose
 // Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes);
-app.use('/api/products', productRoutes) 
+app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes)
 
 export default app;

@@ -1,10 +1,21 @@
 # TechShop
 
-This is the TechShop project, which includes both the front-end and back-end components.
+TechShop is a fully functional eCommerce web application that allows users to browse products, add items to their cart, and proceed to checkout. This project includes both a back-end and front-end implementation.
 
-## Project Structure
+## Key Features
 
-- `back-end/`: Contains the back-end code
-- `front-end/`: Contains the front-end code
+- User Registration & Authentication
+- Product Listing and Search
+- Shopping Cart and Checkout System
+- Order Management
 
+## Technologies
 
+- **Node.js**
+- **Express.js**
+- **MongoDB**
+- **TypeScript**
+- **React**
+- **Redux**
+- **Material-UI**
+- **TailwindCSS**

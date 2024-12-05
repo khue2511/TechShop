@@ -3,6 +3,7 @@ import User from '../models/User';
 import bcrypt from 'bcrypt';
 import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
 import { hashPassword } from '../utils/passwordUtils';
+import jwt from 'jsonwebtoken';
 const router = express.Router();
 
 // POST: Register a new user
@@ -23,7 +24,7 @@ router.post('/register', async (req: Request, res: Response): Promise<any> => {
         .json({ message: 'Username or email already exists' });
     }
 
-    const hashedPassword = await hashPassword(password)
+    const hashedPassword = await hashPassword(password);
     const user = new User({ username, email, password: hashedPassword });
     await user.save();
     res.status(201).send({ message: 'User registered successfully', user });
@@ -43,10 +44,12 @@ router.post('/login', async (req: Request, res: Response): Promise<any> => {
 
   try {
     const user = await User.findOne({ username: req.body.username });
+    // Check if user exists
     if (!user) {
       return res.status(404).json({ message: 'User does not exist' });
     }
 
+    // Check if password is valid
     const isValidPassword = await bcrypt.compare(
       req.body.password,
       user.password,
@@ -56,15 +59,20 @@ router.post('/login', async (req: Request, res: Response): Promise<any> => {
       return res.status(401).json({ message: 'Incorrect password' });
     }
 
-    const accessToken = generateAccessToken(user.id);
-    const refreshToken = generateRefreshToken(user.id);
+    // User authenticated, generate token
+    const payload = {
+      id: user.id,
+      username: user.username,
+    };
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
     res.status(200).json({
       message: 'Logged in!',
       accessToken: accessToken,
       refreshToken: refreshToken,
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).send({ message: 'Internal server error', error });
   }
 });

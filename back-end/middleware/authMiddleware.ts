@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 export const authenticateToken = (
   req: Request,
@@ -22,7 +22,7 @@ export const authenticateToken = (
     if (err) {
       return res.status(403).json({ message: 'Invalid token' });
     }
-    // req.user = decoded; // Attaching user data to request
+    req.user = decoded; // Attaching user data to request
     next();
   });
-};
+}; 

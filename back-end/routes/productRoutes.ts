@@ -1,11 +1,10 @@
 import express, { Request, Response } from 'express';
 import Product from '../models/Product';
-import { authenticateToken } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
 // GET: Get all products
-router.get('/', authenticateToken, async (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     const products = await Product.find();
     res.status(200).send(products);

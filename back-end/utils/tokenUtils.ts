@@ -1,11 +1,6 @@
-import jwt from 'jsonwebtoken';
+import jwt, { Jwt, JwtPayload } from 'jsonwebtoken';
 
-interface payloadType {
-  id: string,
-  username: string
-}
-
-export const generateAccessToken = (payload: payloadType) => {
+export const generateAccessToken = (payload: JwtPayload): string => {
   const secret = process.env.ACCESS_TOKEN_SECRET;
   if (!secret) {
     throw new Error('ACCESS_TOKEN_SECRET is not defined in the environment');
@@ -13,7 +8,7 @@ export const generateAccessToken = (payload: payloadType) => {
   return jwt.sign(payload, secret, { expiresIn: '1h' });
 };
 
-export const generateRefreshToken = (payload: payloadType) => {
+export const generateRefreshToken = (payload: JwtPayload): string => {
   const secret = process.env.REFRESH_TOKEN_SECRET;
   if (!secret) {
     throw new Error('REFRESH_TOKEN_SECRET is not defined in the environment');

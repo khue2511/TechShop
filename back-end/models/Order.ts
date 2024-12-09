@@ -1,6 +1,19 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
-const OrderSchema = new mongoose.Schema({
+export interface IOrderItem {
+  product: mongoose.Types.ObjectId;
+  quantity: number;
+}
+
+export interface IOrder extends Document {
+  userId: mongoose.Types.ObjectId;
+  orderItems: IOrderItem[];
+  totalAmount: number;
+  totalQuantity: number;
+  status: string;
+}
+
+const OrderSchema: Schema<IOrder> = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -35,4 +48,4 @@ const OrderSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model('Order', OrderSchema);
+export default mongoose.model<IOrder>('Order', OrderSchema);

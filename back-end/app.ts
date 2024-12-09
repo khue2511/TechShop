@@ -5,6 +5,7 @@ import userRoutes from './routes/userRoutes'
 import productRoutes from './routes/productRoutes'
 import authRoutes from './routes/authRoutes'
 import cartRoutes from './routes/cartRoutes'
+import orderRoutes from './routes/orderRoutes'
 import cors from 'cors';
 
 dotenv.config();
@@ -30,5 +31,6 @@ app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes)
+app.use('/api/orders', orderRoutes)
 
 export default app;

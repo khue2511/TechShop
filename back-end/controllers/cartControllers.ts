@@ -1,15 +1,17 @@
 import { Request, Response } from 'express';
 import Cart from '../models/Cart';
 import Product from '../models/Product';
+import mongoose from 'mongoose';
 
 // GET: Get user's cart by user id
-export const getCart = async (req: Request, res: Response): Promise<any> => {
+export const getCart = async (req: Request, res: Response): Promise<void> => {
   try {
     const cart = await Cart.findOne({ userId: req.user?.id }).populate(
       'cartItems.product',
     );
     if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
+      res.status(404).json({ message: 'Cart not found' });
+      return;
     }
     res.status(200).json(cart);
   } catch (error) {
@@ -22,18 +24,26 @@ export const getCart = async (req: Request, res: Response): Promise<any> => {
 export const addItemToCart = async (
   req: Request,
   res: Response,
-): Promise<any> => {
+): Promise<void> => {
   const { productId, quantity } = req.body;
   if (!productId || !quantity) {
-    return res
-      .status(400)
-      .json({ message: 'Please provide all required fields' });
+    res.status(400).json({ message: 'Please provide all required fields' });
+    return;
   }
 
   try {
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      res.status(404).json({ message: 'Product does not exist' });
+      return;
+    }
+
+    // Check if the requested quantity is available in stock
+    if (quantity > product.quantity) {
+      res.status(400).json({
+        message: `Insufficient stock. Only ${product.quantity} items available.`,
+      });
+      return;
     }
 
     const cart = await Cart.findOne({ userId: req.user?.id });
@@ -43,6 +53,12 @@ export const addItemToCart = async (
         item.product.equals(productId),
       );
       if (itemIndex > -1) {
+        if (cart.cartItems[itemIndex].quantity + quantity > product.quantity) {
+          res.status(400).json({
+            message: `Cannot add more than ${product.quantity} items to the cart.`,
+          });
+          return;
+        }
         // Product exists in cart, update quantity
         cart.cartItems[itemIndex].quantity += quantity;
         cart.totalAmount += product.price * quantity;
@@ -74,18 +90,23 @@ export const addItemToCart = async (
 };
 
 // DELETE: Remove items from cart
-export const removeItemFromCart = async (req: Request, res: Response): Promise<any> => {
+export const removeItemFromCart = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   const productId = req.params.productId;
 
   try {
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      res.status(404).json({ message: 'Product does not exist' });
+      return;
     }
 
     const cart = await Cart.findOne({ userId: req.user?.id });
     if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
+      res.status(404).json({ message: 'Cart not found' });
+      return;
     }
 
     const itemIndex = cart.cartItems.findIndex((item) =>
@@ -105,12 +126,14 @@ export const removeItemFromCart = async (req: Request, res: Response): Promise<a
       cart.totalQuantity -= 1;
 
       await cart.save();
-      return res.status(200).json({ message: 'Item removed from cart', cart });
+      res.status(200).json({ message: 'Item removed from cart', cart });
+      return;
     } else {
-      return res.status(404).json({ message: 'Product not found in cart' });
+      res.status(404).json({ message: 'Product not found in cart' });
+      return;
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };

@@ -15,11 +15,12 @@ export const getAllProducts = async (req: Request, res: Response) => {
 export const getProductById = async (
   req: Request,
   res: Response,
-): Promise<any> => {
+): Promise<void> => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
-      return res.status(404).send({ message: 'Product not found' });
+      res.status(404).send({ message: 'Product not found' });
+      return;
     }
     res.status(200).send(product);
   } catch (error) {
@@ -43,7 +44,7 @@ export const addProduct = async (req: Request, res: Response) => {
 export const updateProduct = async (
   req: Request,
   res: Response,
-): Promise<any> => {
+): Promise<void> => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
@@ -51,7 +52,8 @@ export const updateProduct = async (
       { new: true },
     );
     if (!updatedProduct) {
-      return res.status(404).send({ message: 'Product not found' });
+      res.status(404).send({ message: 'Product not found' });
+      return;
     }
     res.send({ message: 'Product modified!', updatedProduct });
   } catch (error) {

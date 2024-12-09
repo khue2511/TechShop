@@ -37,16 +37,17 @@ function Login() {
     try {
       const response: AxiosResponse<User> = await axios.post(url, {
         username,
-        password
+        password,
       });
       const data = response.data;
       dispatch(loginSuccess(data));
-    } catch (error: any) {
-      if (error.response) {
-        const errorMessage = error.response.data.message || 'An error occurred';
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data.message ||
+          error.message ||
+          'An error occurred';
         dispatch(loginFailure(errorMessage));
-      } else if (error.request) {
-        dispatch(loginFailure('Network error, please try again.'));
       } else {
         dispatch(loginFailure('An unknown error occurred.'));
       }

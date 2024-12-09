@@ -5,7 +5,9 @@ import Product from '../models/Product';
 // GET: Get user's orders by user id
 export const getOrders = async (req: Request, res: Response): Promise<void> => {
   try {
-    const orders = await Order.find({ userId: req.user?.id });
+    const orders = await Order.find({ userId: req.user?.id }).populate(
+      'orderItems.product',
+    );
     if (!orders || orders.length === 0) {
       res.status(404).json({ message: 'No orders available' });
       return;

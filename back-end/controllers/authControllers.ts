@@ -68,11 +68,31 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     const refreshToken = generateRefreshToken(payload);
     res.status(200).json({
       message: 'Logged in!',
+      id: user.id,
+      username: user.username,
+      email: user.email,
       accessToken: accessToken,
       refreshToken: refreshToken,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: 'Internal server error', error });
+  }
+};
+
+// GET: Get the current user info
+export const getCurrentUser = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    const user = await User.findById(userId);
+    if (user) {
+      res.status(200).send({ id: user.id, username: user.username, email: user.email });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: 'Internal server error' });
   }
 };

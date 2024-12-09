@@ -20,9 +20,10 @@ function Login() {
     isAuthenticated,
     loading,
     error,
-    //  userToken
+    // accessToken,
+    // refreshToken
   } = useSelector((state: RootState) => state.auth);
-  const url = 'https://dummyjson.com/auth/login';
+  const url = 'http://localhost:5000/api/auth/login';
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -36,8 +37,7 @@ function Login() {
     try {
       const response: AxiosResponse<User> = await axios.post(url, {
         username,
-        password,
-        expiresInMins: 60,
+        password
       });
       const data = response.data;
       dispatch(loginSuccess(data));

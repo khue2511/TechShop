@@ -6,7 +6,8 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
-  userToken: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
 }
 
 const initialState: AuthState = {
@@ -14,7 +15,8 @@ const initialState: AuthState = {
   isAuthenticated: false,
   loading: false,
   error: null,
-  userToken: null,
+  accessToken: null,
+  refreshToken: null,
 };
 
 const authSlice = createSlice({
@@ -31,13 +33,11 @@ const authSlice = createSlice({
         id: action.payload.id,
         username: action.payload.username,
         email: action.payload.email,
-        firstName: action.payload.firstName,
-        lastName: action.payload.lastName,
-        gender: action.payload.gender,
       };
       state.isAuthenticated = true;
       state.error = null;
-      state.userToken = action.payload.accessToken;
+      state.accessToken = action.payload.accessToken;
+      state.refreshToken = action.payload.refreshToken;
     },
     loginFailure: (state, action: PayloadAction<string>) => {
       state.loading = false;
@@ -47,7 +47,8 @@ const authSlice = createSlice({
       state.userInfo = null;
       state.isAuthenticated = false;
       state.error = null;
-      state.userToken = null;
+      state.accessToken = null;
+      state.refreshToken = null;
     },
     resetError(state) {
       state.error = null;

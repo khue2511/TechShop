@@ -67,7 +67,7 @@ const Products: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage] = useState<number>(12);
 
-  const url = 'https://673d96620118dbfe8607db5e.mockapi.io/api';
+  const url = 'http://localhost:5000/api';
 
   const getProducts = async () => {
     try {

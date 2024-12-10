@@ -20,19 +20,6 @@ export const getOrders = async (req: Request, res: Response): Promise<void> => {
 };
 
 // POST: Create a new order
-// export const createOrder = async (req: Request, res: Response): Promise<void> => {
-//     const {orderItems} = req.body;
-
-//     if (!orderItems || orderItems.length === 0) {
-//         res.status(400).json({ message: 'Order must contain at least one item' });
-//         return;
-//       }
-
-//       try {
-
-//       }
-// }
-
 export const createOrder = async (
   req: Request,
   res: Response,
@@ -46,12 +33,8 @@ export const createOrder = async (
   }
 
   try {
-    // Fetch the user ID from the request (assumes user is authenticated)
+    // Fetch the user ID from the request 
     const userId = req.user?.id;
-    if (!userId) {
-      res.status(400).json({ message: 'User ID is required' });
-      return;
-    }
 
     // Validate if each product exists and check stock quantities
     let totalAmount = 0;

@@ -23,7 +23,7 @@ function Login() {
     // accessToken,
     // refreshToken
   } = useSelector((state: RootState) => state.auth);
-  const url = 'http://localhost:5000/api/auth/login';
+  const url = process.env.REACT_APP_API_BASE_URL as string;
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -35,7 +35,7 @@ function Login() {
     e.preventDefault();
     dispatch(loginStart());
     try {
-      const response: AxiosResponse<User> = await axios.post(url, {
+      const response: AxiosResponse<User> = await axios.post(`${url}/auth/login`, {
         username,
         password,
       });

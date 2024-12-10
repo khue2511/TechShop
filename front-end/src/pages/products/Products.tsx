@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Product } from '../../types/productTypes';
 import axios, { AxiosResponse } from 'axios';
+import ProductCard from './ProductCard';
 
 const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -36,13 +37,15 @@ const Products: React.FC = () => {
         <>
           <div className="products-list grid grid-cols-1 gap-x-6 gap-y-8 mt-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
             {products.map((product) => (
-              <div key={product.id}>
-                <p>{product.name}</p>
-                <p>{product.price}</p>
-                <p>{product.description}</p>
-                <p>{product.quantity}</p>
-                <p>{product.imageUrl}</p>
-              </div>
+              <ProductCard
+                key={product._id}
+                _id={product._id}
+                name={product.name}
+                description={product.description}
+                quantity={product.quantity}
+                price={product.price}
+                imageUrl={product.imageUrl}
+              />
             ))}
           </div>
         </>

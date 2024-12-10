@@ -20,7 +20,7 @@ function Navbar() {
   const location = useLocation();
 
   useEffect(() => {
-    setMenuOpen(false); 
+    setMenuOpen(false);
   }, [location]);
 
   const handleLogout = () => {
@@ -28,23 +28,24 @@ function Navbar() {
   };
 
   return (
-    <div className="navbar flex flex-col sm:flex-row gap-y-8 sm:items-center justify-between border p-8">
+    <div className="navbar flex flex-col sm:flex-row gap-y-8 sm:items-center justify-between border">
       <div className="flex justify-between">
         <Link
           to="/"
-          className="text-3xl font-bold hover:text-sky-700 cursor-pointer drop-shadow-lg"
+          className="text-3xl font-bold hover:text-sky-700 cursor-pointer drop-shadow-lg m-8"
         >
           TechShop <DevicesIcon />
         </Link>
         <button
-          className="block sm:hidden"
+          className="block sm:hidden m-8"
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          <MenuIcon />
+          <MenuIcon />{' '}
         </button>
       </div>
       <div
-        className={`flex items-center gap-x-10 ${menuOpen ? 'flex-col' : 'hidden'} sm:flex sm:flex-row`}
+        className={`${menuOpen ? 'absolute top-25 left-0 right-0 bg-white border z-10 py-8' : 'hidden'}
+        sm:flex sm:static sm:visible flex-col sm:flex-row sm:items-center sm:gap-x-6 sm:border-none sm:p-0 sm:w-fit sm:m-8 sm:py-0`}
       >
         {!isAuthenticated ? (
           <>
@@ -80,7 +81,7 @@ function Navbar() {
               <p>Cart</p>
             </Link>
             <button
-              className="flex flex-col items-center p-2 hover:text-sky-700 cursor-pointer"
+              className="flex flex-col items-center p-2 hover:text-sky-700 cursor-pointer w-full sm:w-fit"
               onClick={handleLogout}
             >
               <LogoutIcon />

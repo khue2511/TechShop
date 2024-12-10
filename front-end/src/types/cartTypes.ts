@@ -5,8 +5,8 @@ export interface CartItem {
   quantity: number;
 }
 
-export interface CartState {
-  id: string;
+export interface Cart {
+  _id: string;
   userId: string;
   cartItems: CartItem[];
   totalAmount: number;

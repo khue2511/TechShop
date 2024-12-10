@@ -3,8 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { Order } from '../../types/orderTypes';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../redux/authSlice';
+import OrderDetailCard from './OrderDetailCard';
 
 const Orders: React.FC = () => {
+  const dispatch = useDispatch();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { accessToken } = useSelector((state: RootState) => state.auth);
@@ -19,9 +23,13 @@ const Orders: React.FC = () => {
         },
       });
       setOrders(response.data);
+      console.log(response.data);
       setLoading(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching data:', error);
+      if (error.response && error.response.status === 401) {
+        dispatch(logout());
+      }
       setLoading(false);
     }
   };
@@ -31,7 +39,8 @@ const Orders: React.FC = () => {
   }, [accessToken]);
 
   return (
-    <div>
+    <div className="container mx-auto mb-4">
+      <h1 className="text-3xl font-bold my-4">Your Orders</h1>
       {loading ? (
         <div className="flex justify-center items-center h-screen">
           <div className="spinner-border animate-spin inline-block w-16 h-16 border-4 border-solid border-gray-200 border-t-gray-500 rounded-full" />
@@ -42,17 +51,17 @@ const Orders: React.FC = () => {
             <h1>You do not have any orders</h1>
           ) : (
             <div className="flex flex-col gap-y-8">
-              {orders.map((order) => {
-                console.log(order.orderItems);
-                return (
-                  <div key={order.id}>
-                    <p>{order.userId}</p>
-                    <p>{order.totalAmount}</p>
-                    <p>{order.totalQuantity}</p>
-                    <p>{order.status}</p>
-                  </div>
-                );
-              })}
+              {orders.map((order) => (
+                <OrderDetailCard
+                  key={order._id}
+                  id={order._id}
+                  userId={order.userId}
+                  orderItems={order.orderItems}
+                  totalAmount={order.totalAmount}
+                  totalQuantity={order.totalQuantity}
+                  status={order.status}
+                />
+              ))}
             </div>
           )}
         </div>

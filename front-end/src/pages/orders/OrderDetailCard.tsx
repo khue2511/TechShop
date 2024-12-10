@@ -1,32 +1,23 @@
 import React from 'react';
-import { OrderItem } from '../../types/orderTypes';
+import { Order, OrderItem } from '../../types/orderTypes';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 
 interface OrderDetailCardProps {
-  items: OrderItem[];
-  totalAmount: number;
-  status: string;
   id: string;
-  onCancelOrder: (id: string) => void;
-  onCheckoutOrder: (id: string) => void;
+  userId: string;
+  totalAmount: number;
+  totalQuantity: number;
+  status: string;
+  orderItems: OrderItem[];
 }
 
 const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
-  items,
-  totalAmount,
-  status,
   id,
-  onCancelOrder,
-  onCheckoutOrder,
+  totalAmount,
+  totalQuantity,
+  status,
+  orderItems,
 }) => {
-  const handleCancelOrder = () => {
-    onCancelOrder(id);
-  };
-
-  const handleCheckoutOrder = () => {
-    onCheckoutOrder(id);
-  };
-
   return (
     <div className="border rounded shadow-lg">
       <p className="flex items-center gap-x-2 p-4 border-b">
@@ -53,10 +44,10 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
         <span className="text-right font-semibold text-blue-900">Total</span>
       </div>
       <div className="flex flex-col gap-y-4">
-        {items.map((item) => (
+        {orderItems.map((item) => (
           <div
             className="border-b grid grid-cols-5 p-4"
-            key={item.product.id}
+            key={item.product._id}
           >
             <div className="flex col-span-2 gap-x-4">
               <img
@@ -66,12 +57,11 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
               />
               <div>
                 <p className="text-sm text-gray-400">
-                  Product ID: {item.product.id}
+                  Product ID: {item.product._id}
                 </p>
                 <p className="text-lg font-semibold">{item.product.name}</p>
               </div>
             </div>
-
             <p className="text-right">{item.quantity}</p>
             <p className="text-right">${item.product.price}</p>
             <p className="font-semibold text-right">
@@ -79,26 +69,19 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
             </p>
           </div>
         ))}
+        <div className="border-b grid grid-cols-5 p-4">
+          <p className="col-start-4 col-end-5 text-right font-semibold">
+            Total Amount:
+          </p>
+          <span className="text-right text-xl font-bold">${totalAmount}</span>
+        </div>
       </div>
-      <div className="border-b grid grid-cols-5 p-4">
-        <p className="col-start-4 col-end-5 text-right font-semibold">
-          Total Amount:
-        </p>
-        <span className="text-right text-xl font-bold">${totalAmount}</span>
-      </div>
-
       {status == 'pending' ? (
         <div className="flex justify-end gap-x-4 border-b p-4">
-          <button
-            className="bg-red-500 text-white px-4 py-2 hover:bg-red-700 transition duration-100"
-            onClick={handleCancelOrder}
-          >
+          <button className="bg-red-500 text-white px-4 py-2 hover:bg-red-700 transition duration-100">
             Cancel Order
           </button>
-          <button
-            className="bg-black text-white px-4 py-2 hover:bg-white hover:text-black border transition duration-100"
-            onClick={handleCheckoutOrder}
-          >
+          <button className="bg-black text-white px-4 py-2 hover:bg-white hover:text-black border transition duration-100">
             <ShoppingCartCheckoutIcon /> Checkout
           </button>
         </div>

@@ -36,7 +36,7 @@ const Orders: React.FC = () => {
 
   useEffect(() => {
     getOrders();
-  }, [accessToken]);
+  }, []);
 
   return (
     <div className="container mx-auto mb-4">

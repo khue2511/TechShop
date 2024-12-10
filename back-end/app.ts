@@ -33,4 +33,9 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes)
 app.use('/api/orders', orderRoutes)
 
+// Health Check Route
+app.get('/test', (req, res) => {
+  res.status(200).json({ message: 'Server is healthy' });
+});
+
 export default app;

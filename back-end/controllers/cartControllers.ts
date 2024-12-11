@@ -159,9 +159,23 @@ export const clearItemFromCart = async (
       item.product.equals(productId),
     );
     if (itemIndex >= 0) {
+       // Remove the item from the cart
+      const itemToRemove = cart.cartItems[itemIndex];
       cart.cartItems = cart.cartItems.filter(
         (item) => item.product.toString() !== productId,
       );
+      // Fetch the product details to get the price
+      const product = await Product.findById(productId);
+      if (!product) {
+        res.status(404).json({ message: 'Product does not exist' });
+        return;
+      }
+
+      // Recalculate the total amount and quantity
+      cart.totalAmount -= itemToRemove.quantity * product.price;
+      cart.totalQuantity -= itemToRemove.quantity;
+
+      // Save the updated cart
       await cart.save();
       res.status(200).json({ message: 'Item cleared from cart' });
     } else {

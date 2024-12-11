@@ -25,13 +25,12 @@ export const addItemToCart = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const { productId, quantity } = req.body;
-  if (!productId || !quantity) {
-    res.status(400).json({ message: 'Please provide all required fields' });
-    return;
-  }
-
   try {
+    const { productId, quantity } = req.body;
+    if (!productId || !quantity) {
+      res.status(400).json({ message: 'Please provide all required fields' });
+      return;
+    }
     const product = await Product.findById(productId);
     if (!product) {
       res.status(404).json({ message: 'Product does not exist' });
@@ -94,9 +93,8 @@ export const removeItemFromCart = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const productId = req.params.productId;
-
   try {
+    const productId = req.params.productId;
     const product = await Product.findById(productId);
     if (!product) {
       res.status(404).json({ message: 'Product does not exist' });
@@ -134,6 +132,59 @@ export const removeItemFromCart = async (
     }
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// DELETE: Remove item completely from cart
+export const clearItemFromCart = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const productId = req.params.productId;
+    const product = await Product.findById(productId);
+    if (!product) {
+      res.status(404).json({ message: 'Product does not exist' });
+      return;
+    }
+
+    const cart = await Cart.findOne({ userId: req.user?.id });
+    if (!cart) {
+      res.status(404).json({ message: 'Cart not found' });
+      return;
+    }
+
+    const itemIndex = cart.cartItems.findIndex((item) =>
+      item.product.equals(productId),
+    );
+    if (itemIndex >= 0) {
+      cart.cartItems = cart.cartItems.filter(
+        (item) => item.product.toString() !== productId,
+      );
+      await cart.save();
+      res.status(200).json({ message: 'Item cleared from cart' });
+    } else {
+      res.status(404).json({ message: 'Product not found in cart' });
+      return;
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// DELETE: Delete cart
+export const deleteCart = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const cart = await Cart.findOne({ userId });
+    if (!cart) {
+      res.status(404).json({ message: 'Cart not found' });
+      return;
+    }
+    await Cart.deleteOne({ userId });
+    res.status(200).json({ message: 'Cart deleted successfully' });
+  } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
   }
 };

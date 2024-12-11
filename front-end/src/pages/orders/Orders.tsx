@@ -4,7 +4,7 @@ import { Order } from '../../types/orderTypes';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { useDispatch } from 'react-redux';
-import { logout } from '../../redux/authSlice';
+import { logout } from '../../redux/auth/authSlice';
 import OrderDetailCard from './OrderDetailCard';
 
 const Orders: React.FC = () => {

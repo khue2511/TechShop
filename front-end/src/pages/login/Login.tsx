@@ -7,7 +7,7 @@ import {
   loginSuccess,
   loginFailure,
   resetError,
-} from '../../redux/authSlice';
+} from '../../redux/auth/authSlice';
 import { User } from '../../types/userTypes';
 import LoginIcon from '@mui/icons-material/Login';
 

@@ -8,7 +8,7 @@ import DevicesIcon from '@mui/icons-material/Devices';
 import MenuIcon from '@mui/icons-material/Menu';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../redux/authSlice';
+import { logout } from '../../redux/auth/authSlice';
 import { RootState } from '../../redux/store';
 
 function Navbar() {

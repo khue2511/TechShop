@@ -3,6 +3,7 @@ import User, { IUser } from '../models/User';
 import { hashPassword } from '../utils/passwordUtils';
 import bcrypt from 'bcrypt';
 import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 // POST: Register a new user
 export const registerUser = async (
@@ -80,6 +81,53 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// POST: Refresh the token
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    res.status(400).send({ message: 'Refresh token is required' });
+    return;
+  }
+
+  try {
+    const secret = process.env.REFRESH_TOKEN_SECRET;
+    if (!secret) {
+      throw new Error('REFRESH_TOKEN_SECRET is not defined in the environment');
+    }
+
+    jwt.verify(refreshToken, secret, async (err: any, decoded: any) => {
+      if (err) {
+        return res.status(401).json({ message: 'Invalid or expired refresh token' });
+      }
+
+      const existingUser = await User.findById(decoded.id);
+      if (!existingUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      const payload = {
+        id: existingUser.id,
+        username: existingUser.username,
+      };
+
+      const newAccessToken = generateAccessToken(payload);
+      const newRefreshToken = generateRefreshToken(payload);
+
+      res.status(200).json({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      });
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: 'Internal server error', error });
+  }
+};
+
 // GET: Get the current user info
 export const getCurrentUser = async (
   req: Request,
@@ -89,7 +137,9 @@ export const getCurrentUser = async (
     const userId = req.user?.id;
     const user = await User.findById(userId);
     if (user) {
-      res.status(200).send({ id: user.id, username: user.username, email: user.email });
+      res
+        .status(200)
+        .send({ id: user.id, username: user.username, email: user.email });
     }
   } catch (error) {
     console.log(error);

@@ -105,7 +105,16 @@ export const updateOrderStatus = async (
       res.status(404).json({ message: 'Order not found' });
       return;
     }
-
+    // If the order is being cancelled, update product quantities
+    if (status === 'cancelled') {
+      for (const orderItem of order.orderItems) {
+        const product = await Product.findById(orderItem.product);
+        if (product) {
+          product.quantity += orderItem.quantity;
+          await product.save();
+        }
+      }
+    }
     order.status = status;
     await order.save();
     const populatedOrder = await order.populate('orderItems.product');

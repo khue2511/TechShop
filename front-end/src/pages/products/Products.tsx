@@ -2,19 +2,34 @@ import React, { useEffect, useState } from 'react';
 import { Product } from '../../types/productTypes';
 import axios, { AxiosResponse } from 'axios';
 import ProductCard from './ProductCard';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   const url = process.env.REACT_APP_API_BASE_URL as string;
+  const limit = 12;
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const getProducts = async () => {
+  const getProducts = async (page: number) => {
     try {
-      const response: AxiosResponse<Product[]> = await axios.get(
-        `${url}/products`,
-      );
-      setProducts(response.data);
+      const response: AxiosResponse<{
+        products: Product[];
+        total: number;
+        page: number;
+        pages: number;
+      }> = await axios.get(`${url}/products`, {
+        params: {
+          page,
+          limit,
+        },
+      });
+      setProducts(response.data.products);
+      setTotalPages(response.data.pages);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -23,8 +38,18 @@ const Products: React.FC = () => {
   };
 
   useEffect(() => {
-    getProducts();
-  }, []);
+    const params = new URLSearchParams(location.search);
+    const page = parseInt(params.get('page') || '1', 10);
+    setCurrentPage(page);
+    getProducts(page);
+  }, [location.search]);
+
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setLoading(true);
+    setCurrentPage(page);
+    navigate(`?page=${page}`);
+  };
 
   return (
     <div className="product-page-container flex flex-col items-center m-auto pb-12 pt-8">
@@ -50,6 +75,23 @@ const Products: React.FC = () => {
           </div>
         </>
       )}
+      <div className="pagination mt-8 flex items-center">
+        <button
+          className="px-2 py-1 rounded-sm bg-gray-200 disabled:bg-white"
+          disabled={currentPage === 1}
+          onClick={() => handlePageChange(currentPage - 1)}
+        >
+          &lt;
+        </button>
+        <span className="px-4 py-2 m-1">{currentPage}</span>
+        <button
+          className="px-2 py-1 rounded-sm bg-gray-200 disabled:bg-white"
+          disabled={currentPage === totalPages}
+          onClick={() => handlePageChange(currentPage + 1)}
+        >
+          &gt;
+        </button>
+      </div>
     </div>
   );
 };

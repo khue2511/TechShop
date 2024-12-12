@@ -61,7 +61,7 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
             className="border-b grid grid-cols-5 p-4"
             key={item.product._id}
           >
-            <div className="flex col-span-3 gap-x-4">
+            <div className="flex flex-col gap-y-1 col-span-3 sm:flex-row sm:gap-x-4">
               <img
                 className="w-24 h-24 rounded"
                 src={item.product.imageUrl}
@@ -84,7 +84,7 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
           </div>
         ))}
         <div className="border-b grid grid-cols-5 p-4">
-          <p className="col-start-4 col-end-5 text-right font-semibold">
+          <p className="col-start-3 sm:col-start-4 col-end-5 text-right font-semibold">
             Total Amount:
           </p>
           <span className="text-right text-xl font-bold">${totalAmount}</span>

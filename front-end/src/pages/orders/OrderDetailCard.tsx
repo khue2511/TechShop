@@ -1,5 +1,5 @@
 import React from 'react';
-import { Order, OrderItem } from '../../types/orderTypes';
+import { OrderItem } from '../../types/orderTypes';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 
 interface OrderDetailCardProps {
@@ -14,7 +14,6 @@ interface OrderDetailCardProps {
 const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
   id,
   totalAmount,
-  totalQuantity,
   status,
   orderItems,
 }) => {
@@ -36,20 +35,21 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
       </p>
 
       <div className="border-b grid grid-cols-5 bg-zinc-100 p-4">
-        <span className="col-span-2 font-semibold text-blue-900">
+        <span className="col-span-3 font-semibold text-blue-900">
           Product Name
         </span>
-        <span className="text-right font-semibold text-blue-900">Quantity</span>
-        <span className="text-right font-semibold text-blue-900">Price</span>
+        <span className="text-right font-semibold text-blue-900">
+          Qty x Price
+        </span>
         <span className="text-right font-semibold text-blue-900">Total</span>
       </div>
-      <div className="flex flex-col gap-y-4">
+      <div className="flex flex-col">
         {orderItems.map((item) => (
           <div
             className="border-b grid grid-cols-5 p-4"
             key={item.product._id}
           >
-            <div className="flex col-span-2 gap-x-4">
+            <div className="flex col-span-3 gap-x-4">
               <img
                 className="w-24 h-24 rounded"
                 src={item.product.imageUrl}
@@ -62,8 +62,10 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
                 <p className="text-lg font-semibold">{item.product.name}</p>
               </div>
             </div>
-            <p className="text-right">{item.quantity}</p>
-            <p className="text-right">${item.product.price}</p>
+            <p className="text-right">
+              {item.quantity} x{' '}
+              <span className="font-semibold">${item.product.price}</span>
+            </p>
             <p className="font-semibold text-right">
               ${item.product.price * item.quantity}
             </p>

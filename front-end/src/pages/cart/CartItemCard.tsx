@@ -61,7 +61,7 @@ const CartItemCard: React.FC<CartItemCardProps> = ({ item }) => {
             {quantity}
           </span>
           <button
-            className="border border-gray-400 rounded w-8 h-8"
+            className="border border-gray-400 rounded w-8 h-8 disabled:cursor-not-allowed disabled:text-gray-300 disabled:border-gray-300"
             disabled={quantity === product.quantity}
             onClick={handleIncreaseQuantity}
           >

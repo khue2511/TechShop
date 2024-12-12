@@ -119,6 +119,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../redux/auth/authSlice';
 import { RootState } from '../../redux/store';
 import { resetCart } from '../../redux/cart/cartSlice';
+import { resetOrders } from '../../redux/orders/ordersSlice';
 
 function Navbar() {
   const dispatch = useDispatch();
@@ -139,6 +140,7 @@ function Navbar() {
   const handleLogout = () => {
     dispatch(logout());
     dispatch(resetCart());
+    dispatch(resetOrders());
   };
 
   const handleLogoClick = () => {

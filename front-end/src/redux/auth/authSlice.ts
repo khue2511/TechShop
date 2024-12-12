@@ -4,19 +4,19 @@ import { User, UserInfo } from '../../types/userTypes';
 interface AuthState {
   userInfo: UserInfo | null;
   isAuthenticated: boolean;
-  loading: boolean;
-  error: string | null;
   accessToken: string | null;
   refreshToken: string | null;
+  loading: boolean;
+  error: string | null;
 }
 
 const initialState: AuthState = {
   userInfo: null,
   isAuthenticated: false,
-  loading: false,
-  error: null,
   accessToken: null,
   refreshToken: null,
+  loading: false,
+  error: null,
 };
 
 const authSlice = createSlice({

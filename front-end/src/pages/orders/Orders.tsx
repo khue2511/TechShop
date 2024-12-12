@@ -1,43 +1,16 @@
-import axios, { AxiosResponse } from 'axios';
-import React, { useEffect, useState } from 'react';
-import { Order } from '../../types/orderTypes';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { AppDispatch, RootState } from '../../redux/store';
 import { useDispatch } from 'react-redux';
-import { logout } from '../../redux/auth/authSlice';
 import OrderDetailCard from './OrderDetailCard';
-import { resetCart } from '../../redux/cart/cartSlice';
+import { fetchOrders } from '../../redux/orders/ordersSlice';
 
 const Orders: React.FC = () => {
-  const dispatch = useDispatch();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const { accessToken } = useSelector((state: RootState) => state.auth);
-
-  const url = process.env.REACT_APP_API_BASE_URL as string;
-
-  const getOrders = async () => {
-    try {
-      const response: AxiosResponse = await axios.get(`${url}/orders`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      setOrders(response.data);
-      console.log(response.data);
-      setLoading(false);
-    } catch (error: any) {
-      console.error('Error fetching data:', error);
-      if (error.response && error.response.status === 401) {
-        dispatch(logout());
-        dispatch(resetCart())
-      }
-      setLoading(false);
-    }
-  };
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, orders } = useSelector((state: RootState) => state.orders)
 
   useEffect(() => {
-    getOrders();
+    dispatch(fetchOrders());
   }, []);
 
   return (

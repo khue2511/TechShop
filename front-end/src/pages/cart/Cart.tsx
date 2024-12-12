@@ -3,13 +3,25 @@ import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
 import CartItemCard from './CartItemCard';
 import { useDispatch } from 'react-redux';
-import { fetchCart } from '../../redux/cart/cartSlice';
+import { emptyCart, fetchCart } from '../../redux/cart/cartSlice';
+import { createOrders } from '../../redux/orders/ordersSlice';
 
 const Cart: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { cartItems, totalAmount, loading } = useSelector(
     (state: RootState) => state.cart,
   );
+
+  const handlePlaceOrder = () => {
+    const orderItems = cartItems.map(item => ({
+      product: item.product._id,
+      quantity: item.quantity
+    }))
+
+    dispatch(createOrders(orderItems));
+    dispatch(emptyCart())
+    alert('Order created!')
+  }
 
   useEffect(() => {
     dispatch(fetchCart());
@@ -37,7 +49,10 @@ const Cart: React.FC = () => {
               Total Amount: ${totalAmount}
             </h2>
           </div>
-          <button className="block ml-auto mt-4 px-4 py-2 border bg-black text-white hover:bg-white hover:text-black transition duration-100">
+          <button
+            className="block ml-auto mt-4 px-4 py-2 border bg-black text-white hover:bg-white hover:text-black transition duration-100"
+            onClick={handlePlaceOrder}
+          >
             Place Order
           </button>
         </div>

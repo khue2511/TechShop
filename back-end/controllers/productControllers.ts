@@ -1,11 +1,20 @@
 import { Request, Response } from 'express';
 import Product from '../models/Product';
 
-// GET: Get all products
+// GET: Get all products with pagination
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
-    const products = await Product.find();
-    res.status(200).send(products);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 12;
+    const skip = (page - 1) * limit;
+    const products = await Product.find().skip(skip).limit(limit);
+    const total = await Product.countDocuments();
+    res.status(200).send({
+      products, 
+      total,    
+      page,     
+      pages: Math.ceil(total / limit), 
+    });;
   } catch (error) {
     res.status(500).send({ message: 'Internal Server Error', error });
   }

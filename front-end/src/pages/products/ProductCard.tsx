@@ -1,8 +1,9 @@
 import { IconButton } from '@mui/material';
 import React from 'react';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../redux/store';
+import { addToCart, removeFromCart } from '../../redux/cart/cartSlice';
 
 interface ProductCardProps {
   _id: string;
@@ -21,9 +22,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
   description,
   imageUrl,
 }) => {
+  const dispatch = useDispatch<AppDispatch>()
   const cartItems = useSelector((state: RootState) => state.cart.cartItems);
   const cartItem = cartItems.find((item) => item.product._id === _id);
   const isInCart = cartItems.some((item) => item.product._id === _id);
+
+  const handleAddToCart = () => {
+    dispatch(addToCart(_id))
+  }
+  const handleDecreaseQuantity = () => {
+    dispatch(removeFromCart(_id));
+  };
 
   return (
     <div className="product-card flex flex-col border max-w-72 rounded-md shadow-lg p-4">
@@ -47,6 +56,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <div className="flex items-center gap-x-1">
               <button
                 className="border border-gray-400 rounded w-7 h-7"
+                onClick={handleDecreaseQuantity}
               >
                 -
               </button>
@@ -54,6 +64,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <button
                 className="border border-gray-400 rounded w-7 h-7 disabled:cursor-not-allowed disabled:text-gray-300 disabled:border-gray-300"
                 disabled={quantity === cartItem?.quantity}
+                onClick={handleAddToCart}
               >
                 +
               </button>
@@ -62,6 +73,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <IconButton
               color="primary"
               aria-label="add to shopping cart"
+              onClick={handleAddToCart}
             >
               <AddShoppingCartIcon />
             </IconButton>

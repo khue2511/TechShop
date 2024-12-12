@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import React, { useEffect, useState } from 'react';
-import { RootState } from '../../redux/store';
+import { AppDispatch, RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   loginStart,
@@ -10,11 +10,12 @@ import {
 } from '../../redux/auth/authSlice';
 import { User } from '../../types/userTypes';
 import LoginIcon from '@mui/icons-material/Login';
+import { fetchCart } from '../../redux/cart/cartSlice';
 
 function Login() {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const {
     userInfo,
     isAuthenticated,
@@ -41,6 +42,7 @@ function Login() {
       });
       const data = response.data;
       dispatch(loginSuccess(data));
+      dispatch(fetchCart())
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const errorMessage =

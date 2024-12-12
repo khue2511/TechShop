@@ -6,6 +6,7 @@ import { RootState } from '../../redux/store';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/auth/authSlice';
 import OrderDetailCard from './OrderDetailCard';
+import { resetCart } from '../../redux/cart/cartSlice';
 
 const Orders: React.FC = () => {
   const dispatch = useDispatch();
@@ -29,6 +30,7 @@ const Orders: React.FC = () => {
       console.error('Error fetching data:', error);
       if (error.response && error.response.status === 401) {
         dispatch(logout());
+        dispatch(resetCart())
       }
       setLoading(false);
     }

@@ -10,11 +10,15 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../redux/auth/authSlice';
 import { RootState } from '../../redux/store';
+import { resetCart } from '../../redux/cart/cartSlice';
 
 function Navbar() {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated,
+  );
+  const cartTotalQuantity = useSelector(
+    (state: RootState) => state.cart.totalQuantity,
   );
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const location = useLocation();
@@ -25,6 +29,7 @@ function Navbar() {
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(resetCart());
   };
 
   return (
@@ -77,7 +82,13 @@ function Navbar() {
               to="/cart"
               className="flex flex-col items-center p-2 hover:text-sky-700 cursor-pointer"
             >
-              <ShoppingCartIcon />
+              <div>
+                <ShoppingCartIcon />
+                <span className="text-xs px-1 rounded-sm bg-rose-700 text-white absolute ">
+                  {cartTotalQuantity}
+                </span>
+              </div>
+
               <p>Cart</p>
             </Link>
             <button

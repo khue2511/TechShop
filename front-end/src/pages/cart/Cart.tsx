@@ -1,41 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Cart as CartType } from '../../types/cartTypes';
-import axios, { AxiosResponse } from 'axios';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { AppDispatch, RootState } from '../../redux/store';
 import CartItemCard from './CartItemCard';
+import { useDispatch } from 'react-redux';
+import { fetchCart } from '../../redux/cart/cartSlice';
 
 const Cart: React.FC = () => {
-  const [cart, setCart] = useState<CartType>({
-    _id: '',
-    cartItems: [],
-    totalAmount: 0,
-    totalQuantity: 0,
-    userId: '',
-  });
-  const [loading, setLoading] = useState<boolean>(true);
-
-  const { accessToken } = useSelector((state: RootState) => state.auth);
-  const url = process.env.REACT_APP_API_BASE_URL;
-
-  const getCart = async () => {
-    try {
-      const response: AxiosResponse = await axios.get(`${url}/cart`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      setCart(response.data);
-      console.log(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setLoading(false);
-    }
-  };
+  const dispatch = useDispatch<AppDispatch>();
+  const { cartItems, totalAmount, loading } = useSelector(
+    (state: RootState) => state.cart,
+  );
 
   useEffect(() => {
-    getCart();
+    dispatch(fetchCart());
   }, []);
 
   return (
@@ -45,20 +22,19 @@ const Cart: React.FC = () => {
         <div className="flex justify-center items-center h-screen">
           <div className="spinner-border animate-spin inline-block w-16 h-16 border-4 border-solid border-gray-200 border-t-gray-500 rounded-full" />
         </div>
-      ) : cart.cartItems.length === 0 ? (
+      ) : cartItems.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
         <div>
-          {cart.cartItems.map((item) => (
+          {cartItems.map((item) => (
             <CartItemCard
               key={item.product._id}
               item={item}
-              onUpdate={getCart}
             />
           ))}
           <div className="text-right">
             <h2 className="text-xl font-bold mt-4">
-              Total Amount: ${cart.totalAmount}
+              Total Amount: ${totalAmount}
             </h2>
           </div>
           <button className="block ml-auto mt-4 px-4 py-2 border bg-black text-white hover:bg-white hover:text-black transition duration-100">

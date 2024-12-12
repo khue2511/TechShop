@@ -1,5 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CartItem } from '../../types/cartTypes';
+import axios from 'axios';
+import { logout } from '../auth/authSlice';
+import { RootState } from '../store';
 
 interface CartState {
   _id: string | null;
@@ -7,6 +10,7 @@ interface CartState {
   totalAmount: number;
   totalQuantity: number;
   loading: boolean;
+  error: string | null;
 }
 
 const initialState: CartState = {
@@ -15,7 +19,98 @@ const initialState: CartState = {
   totalAmount: 0,
   totalQuantity: 0,
   loading: true,
+  error: null,
 };
+
+const getAuthHeaders = (state: RootState) => ({
+  Authorization: `Bearer ${state.auth.accessToken}`,
+});
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+export const fetchCart = createAsyncThunk(
+  'cart/fetchCart',
+  async (_, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const state = getState() as RootState;
+      const response = await axios.get(`${apiBaseUrl}/cart`, {
+        headers: getAuthHeaders(state),
+      });
+      return response.data;
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        dispatch(logout());
+        dispatch(resetCart());
+      }
+      return rejectWithValue(error.response?.data || 'Failed to fetch cart');
+    }
+  },
+);
+
+export const addToCart = createAsyncThunk(
+  'cart/addToCart',
+  async (productId: string, { getState, dispatch, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const response = await axios.post(
+        `${apiBaseUrl}/cart/add`,
+        { productId, quantity: 1 },
+        {
+          headers: getAuthHeaders(state),
+        },
+      );
+      return response.data;
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        dispatch(logout());
+        dispatch(resetCart());
+      }
+      return rejectWithValue(error.response?.data);
+    }
+  },
+);
+
+export const removeFromCart = createAsyncThunk(
+  'cart/removeFromCart',
+  async (productId: string, { getState, dispatch, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const response = await axios.delete(
+        `${apiBaseUrl}/cart/remove/${productId}`,
+        {
+          headers: getAuthHeaders(state),
+        },
+      );
+      return response.data;
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        dispatch(logout());
+        dispatch(resetCart());
+      }
+      return rejectWithValue(error.response?.data);
+    }
+  },
+);
+
+export const clearFromCart = createAsyncThunk(
+  'cart/clearFromCart',
+  async (productId: string, { getState, dispatch, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const response = await axios.delete(
+        `${apiBaseUrl}/cart/clear/${productId}`,
+        {
+          headers: getAuthHeaders(state),
+        },
+      );
+      return response.data;
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        dispatch(logout());
+        dispatch(resetCart());
+      }
+      return rejectWithValue(error.response?.data);
+    }
+  },
+);
 
 const cartSlice = createSlice({
   name: 'cart',
@@ -37,10 +132,44 @@ const cartSlice = createSlice({
       state.totalAmount = 0;
       state.totalQuantity = 0;
       state.loading = true;
-    }
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchCart.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCart.fulfilled, (state, action) => {
+        state.loading = false;
+        state._id = action.payload._id;
+        state.cartItems = action.payload.cartItems;
+        state.totalAmount = action.payload.totalAmount;
+        state.totalQuantity = action.payload.totalQuantity;
+        state.error = null;
+      })
+      .addCase(fetchCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(addToCart.fulfilled, (state, action) => {
+        state.cartItems = action.payload.cartItems;
+        state.totalAmount = action.payload.totalAmount;
+        state.totalQuantity = action.payload.totalQuantity;
+      })
+      .addCase(removeFromCart.fulfilled, (state, action) => {
+        state.cartItems = action.payload.cartItems;
+        state.totalAmount = action.payload.totalAmount;
+        state.totalQuantity = action.payload.totalQuantity;
+      })
+      .addCase(clearFromCart.fulfilled, (state, action) => {
+        state.cartItems = action.payload.cartItems;
+        state.totalAmount = action.payload.totalAmount;
+        state.totalQuantity = action.payload.totalQuantity;
+      });
   },
 });
 
-export const { setCart, setLoading } = cartSlice.actions;
+export const { setCart, setLoading, resetCart } = cartSlice.actions;
 
 export default cartSlice.reducer;

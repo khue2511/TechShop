@@ -1,57 +1,32 @@
 import React from 'react';
 import { CartItem as CartItemType } from '../../types/cartTypes';
 import DeleteIcon from '@mui/icons-material/Delete';
-import axios from 'axios';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../redux/store';
+import {
+  addToCart,
+  clearFromCart,
+  removeFromCart,
+} from '../../redux/cart/cartSlice';
 
 interface CartItemCardProps {
   item: CartItemType;
-  onUpdate: () => void; // Callback to update the cart after actions
 }
 
-const CartItemCard: React.FC<CartItemCardProps> = ({ item, onUpdate }) => {
+const CartItemCard: React.FC<CartItemCardProps> = ({ item }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const { product, quantity } = item;
-  const { accessToken } = useSelector((state: RootState) => state.auth);
-  const url = process.env.REACT_APP_API_BASE_URL;
 
-  const handleDecreaseQuantity = async () => {
-    try {
-      await axios.delete(`${url}/cart/remove/${product._id}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      onUpdate(); // Refresh the cart
-    } catch (error) {
-      console.error('Error decreasing quantity:', error);
-    }
+  const handleDecreaseQuantity = () => {
+    dispatch(removeFromCart(product._id));
   };
 
-  const handleIncreaseQuantity = async () => {
-    try {
-      await axios.post(`${url}/cart/add`, { productId: product._id, quantity: 1 }, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      onUpdate(); // Refresh the cart
-    } catch (error) {
-      console.error('Error increasing quantity:', error);
-    }
+  const handleIncreaseQuantity = () => {
+    dispatch(addToCart(product._id));
   };
 
-  const handleRemoveItem = async () => {
-    try {
-      await axios.delete(`${url}/cart/clear/${product._id}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      onUpdate(); // Refresh the cart
-    } catch (error) {
-      console.error('Error removing item:', error);
-    }
+  const handleClearItem = () => {
+    dispatch(clearFromCart(product._id));
   };
 
   return (
@@ -95,7 +70,7 @@ const CartItemCard: React.FC<CartItemCardProps> = ({ item, onUpdate }) => {
         </div>
         <button
           className="text-red-500 hover:text-red-700"
-          onClick={handleRemoveItem}
+          onClick={handleClearItem}
         >
           <DeleteIcon />
         </button>

@@ -83,9 +83,10 @@ export const createOrder = async (
 
     // Save the order to the database
     await newOrder.save();
+    const populatedOrder = await newOrder.populate('orderItems.product');
 
     // Return the newly created order
-    res.status(201).json(newOrder);
+    res.status(201).json(populatedOrder);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Internal server error' });

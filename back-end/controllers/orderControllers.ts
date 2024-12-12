@@ -26,14 +26,13 @@ export const createOrder = async (
 ): Promise<void> => {
   const { orderItems } = req.body;
 
-  // Validate if orderItems are provided
   if (!orderItems || orderItems.length === 0) {
     res.status(400).json({ message: 'Order must contain at least one item' });
     return;
   }
 
   try {
-    // Fetch the user ID from the request 
+    // Fetch the user ID from the request
     const userId = req.user?.id;
 
     // Validate if each product exists and check stock quantities
@@ -57,22 +56,18 @@ export const createOrder = async (
         return;
       }
 
-      // Update the total amount and quantity
       totalAmount += product.price * item.quantity;
       totalQuantity += item.quantity;
 
-      // Add to the order items details
       orderItemsDetails.push({
         product: item.product,
         quantity: item.quantity,
       });
 
-      // Optionally, reduce stock in the Product model (if you want to update stock)
       product.quantity -= item.quantity;
       await product.save();
     }
 
-    // Create the new order
     const newOrder = new Order({
       userId,
       orderItems: orderItemsDetails,
@@ -81,12 +76,39 @@ export const createOrder = async (
       status: 'pending', // Default status is 'pending'
     });
 
-    // Save the order to the database
     await newOrder.save();
     const populatedOrder = await newOrder.populate('orderItems.product');
-
-    // Return the newly created order
     res.status(201).json(populatedOrder);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// PUT: Update an order status
+export const updateOrderStatus = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const orderId = req.params.orderId;
+    const { status } = req.body;
+
+    const validStatuses = ['pending', 'cancelled', 'confirmed'];
+    if (!validStatuses.includes(status)) {
+      res.status(400).json({ message: 'Invalid order status' });
+      return;
+    }
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      res.status(404).json({ message: 'Order not found' });
+      return;
+    }
+
+    order.status = status;
+    await order.save();
+    res.status(200).json(order);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Internal server error' });

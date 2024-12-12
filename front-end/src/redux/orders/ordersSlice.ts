@@ -69,6 +69,35 @@ export const createOrders = createAsyncThunk(
   },
 );
 
+export const updateOrderStatus = createAsyncThunk(
+  'orders/updateOrderStatus',
+  async (
+    { orderId, status }: { orderId: string; status: string },
+    { rejectWithValue, dispatch, getState },
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const response = await axios.put(
+        `${apiBaseUrl}/orders/${orderId}`,
+        { status: status },
+        {
+          headers: getAuthHeaders(state),
+        },
+      );
+      return response.data;
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        dispatch(logout());
+        dispatch(resetCart());
+        dispatch(resetOrders());
+      }
+      return rejectWithValue(
+        error.response?.data || 'Failed to update order status',
+      );
+    }
+  },
+);
+
 const orderSlice = createSlice({
   name: 'orders',
   initialState,
@@ -104,6 +133,25 @@ const orderSlice = createSlice({
         state.error = null;
       })
       .addCase(createOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateOrderStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateOrderStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedOrder = action.payload;
+        const index = state.orders.findIndex(
+          (order) => order._id === updatedOrder._id,
+        );
+        if (index !== -1) {
+          state.orders[index] = updatedOrder;
+        }
+        state.error = null;
+      })
+      .addCase(updateOrderStatus.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

@@ -108,7 +108,8 @@ export const updateOrderStatus = async (
 
     order.status = status;
     await order.save();
-    res.status(200).json(order);
+    const populatedOrder = await order.populate('orderItems.product');
+    res.status(200).json(populatedOrder);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Internal server error' });

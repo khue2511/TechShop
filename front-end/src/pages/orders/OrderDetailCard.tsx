@@ -1,6 +1,9 @@
 import React from 'react';
 import { OrderItem } from '../../types/orderTypes';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../redux/store';
+import { updateOrderStatus } from '../../redux/orders/ordersSlice';
 
 interface OrderDetailCardProps {
   id: string;
@@ -17,6 +20,15 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
   status,
   orderItems,
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const handleCancelOrder = () => {
+    dispatch(updateOrderStatus({ orderId: id, status: 'cancelled' }));
+  };
+
+  const handleConfirmOrder = () => {
+    dispatch(updateOrderStatus({ orderId: id, status: 'confirmed' }));
+  };
+
   return (
     <div className="border rounded shadow-lg">
       <p className="flex items-center gap-x-2 p-4 border-b">
@@ -27,7 +39,7 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
               ? 'bg-zinc-200'
               : status === 'confirmed'
                 ? 'bg-green-500 text-white'
-                : 'bg-default'
+                : 'bg-rose-700 text-white'
           } `}
         >
           {status}
@@ -80,10 +92,16 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
       </div>
       {status == 'pending' ? (
         <div className="flex justify-end gap-x-4 border-b p-4">
-          <button className="bg-red-500 text-white px-4 py-2 hover:bg-red-700 transition duration-100">
+          <button
+            className="bg-red-500 text-white px-4 py-2 hover:bg-red-700 transition duration-100"
+            onClick={handleCancelOrder}
+          >
             Cancel Order
           </button>
-          <button className="bg-black text-white px-4 py-2 hover:bg-white hover:text-black border transition duration-100">
+          <button
+            className="bg-black text-white px-4 py-2 hover:bg-white hover:text-black border transition duration-100"
+            onClick={handleConfirmOrder}
+          >
             <ShoppingCartCheckoutIcon /> Checkout
           </button>
         </div>

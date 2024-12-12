@@ -4,6 +4,7 @@ import {
   addItemToCart,
   clearItemFromCart,
   deleteCart,
+  emptyCart,
   getCart,
   removeItemFromCart,
 } from '../controllers/cartControllers';
@@ -24,5 +25,8 @@ router.delete('/clear/:productId', authenticateToken, clearItemFromCart);
 
 // DELETE: Delete cart
 router.delete('/', authenticateToken, deleteCart);
+
+// DELETE: Empty cart
+router.delete('/empty', authenticateToken, emptyCart)
 
 export default router;

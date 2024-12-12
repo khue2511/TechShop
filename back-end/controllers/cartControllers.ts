@@ -206,3 +206,24 @@ export const deleteCart = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+// DELETE: Empty cart
+export const emptyCart = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const cart = await Cart.findOne({ userId: req.user?.id });
+    if (!cart) {
+      res.status(404).json({ message: 'Cart not found' });
+      return;
+    }
+
+    cart.cartItems = [];
+    cart.totalAmount = 0;
+    cart.totalQuantity = 0;
+
+    await cart.save();
+    res.status(200).json({ cart });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};

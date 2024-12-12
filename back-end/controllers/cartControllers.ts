@@ -69,7 +69,8 @@ export const addItemToCart = async (
         cart.totalQuantity += quantity;
       }
       await cart.save();
-      res.status(201).json(cart);
+      await cart.populate('cartItems.product');
+      res.status(201).json( cart );
     } else {
       // No cart for user, create new cart
       const cart = new Cart({
@@ -80,6 +81,7 @@ export const addItemToCart = async (
       });
 
       await cart.save();
+      await cart.populate('cartItems.product');
       res.status(201).json(cart);
     }
   } catch (error) {
@@ -124,7 +126,8 @@ export const removeItemFromCart = async (
       cart.totalQuantity -= 1;
 
       await cart.save();
-      res.status(200).json({ message: 'Item removed from cart', cart });
+      await cart.populate('cartItems.product');
+      res.status(200).json(cart);
       return;
     } else {
       res.status(404).json({ message: 'Product not found in cart' });
@@ -159,7 +162,7 @@ export const clearItemFromCart = async (
       item.product.equals(productId),
     );
     if (itemIndex >= 0) {
-       // Remove the item from the cart
+      // Remove the item from the cart
       const itemToRemove = cart.cartItems[itemIndex];
       cart.cartItems = cart.cartItems.filter(
         (item) => item.product.toString() !== productId,
@@ -177,7 +180,8 @@ export const clearItemFromCart = async (
 
       // Save the updated cart
       await cart.save();
-      res.status(200).json({ message: 'Item cleared from cart' });
+      await cart.populate('cartItems.product')
+      res.status(200).json(cart);
     } else {
       res.status(404).json({ message: 'Product not found in cart' });
       return;

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CartItem } from '../../types/cartTypes';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { logout } from '../auth/authSlice';
 import { RootState } from '../store';
 import { resetOrders } from '../orders/ordersSlice';
@@ -37,13 +37,14 @@ export const fetchCart = createAsyncThunk(
         headers: getAuthHeaders(state),
       });
       return response.data;
-    } catch (error: any) {
-      if (error.response && error.response.status === 401) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 401) {
         dispatch(logout());
         dispatch(resetCart());
         dispatch(resetOrders());
       }
-      return rejectWithValue(error.response?.data || 'Failed to fetch cart');
+      return rejectWithValue(axiosError.response?.data || 'Failed to fetch orders');
     }
   },
 );
@@ -57,13 +58,14 @@ export const emptyCart = createAsyncThunk(
         headers: getAuthHeaders(state),
       });
       return response.data;
-    } catch (error: any) {
-      if (error.response && error.response.status === 401) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 401) {
         dispatch(logout());
         dispatch(resetCart());
         dispatch(resetOrders());
       }
-      return rejectWithValue(error.response?.data || 'Failed to fetch cart');
+      return rejectWithValue(axiosError.response?.data || 'Failed to fetch orders');
     }
   },
 );
@@ -81,13 +83,14 @@ export const addToCart = createAsyncThunk(
         },
       );
       return response.data;
-    } catch (error: any) {
-      if (error.response && error.response.status === 401) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 401) {
         dispatch(logout());
         dispatch(resetCart());
         dispatch(resetOrders());
       }
-      return rejectWithValue(error.response?.data);
+      return rejectWithValue(axiosError.response?.data || 'Failed to fetch orders');
     }
   },
 );
@@ -104,13 +107,14 @@ export const removeFromCart = createAsyncThunk(
         },
       );
       return response.data;
-    } catch (error: any) {
-      if (error.response && error.response.status === 401) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 401) {
         dispatch(logout());
         dispatch(resetCart());
         dispatch(resetOrders());
       }
-      return rejectWithValue(error.response?.data);
+      return rejectWithValue(axiosError.response?.data || 'Failed to fetch orders');
     }
   },
 );
@@ -127,13 +131,14 @@ export const clearFromCart = createAsyncThunk(
         },
       );
       return response.data;
-    } catch (error: any) {
-      if (error.response && error.response.status === 401) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 401) {
         dispatch(logout());
         dispatch(resetCart());
         dispatch(resetOrders());
       }
-      return rejectWithValue(error.response?.data);
+      return rejectWithValue(axiosError.response?.data || 'Failed to fetch orders');
     }
   },
 );

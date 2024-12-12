@@ -3,7 +3,7 @@ import { Order } from '../../types/orderTypes';
 import { RootState } from '../store';
 import { logout } from '../auth/authSlice';
 import { resetCart } from '../cart/cartSlice';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 interface OrderState {
   orders: Order[];
@@ -31,13 +31,14 @@ export const fetchOrders = createAsyncThunk(
         headers: getAuthHeaders(state),
       });
       return response.data;
-    } catch (error: any) {
-      if (error.response && error.response.status === 401) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 401) {
         dispatch(logout());
         dispatch(resetCart());
         dispatch(resetOrders());
       }
-      return rejectWithValue(error.response?.data || 'Failed to fetch cart');
+      return rejectWithValue(axiosError.response?.data || 'Failed to fetch orders');
     }
   },
 );
@@ -58,13 +59,14 @@ export const createOrders = createAsyncThunk(
         },
       );
       return response.data;
-    } catch (error: any) {
-      if (error.response && error.response.status === 401) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 401) {
         dispatch(logout());
         dispatch(resetCart());
         dispatch(resetOrders());
       }
-      return rejectWithValue(error.response?.data || 'Failed to create order');
+      return rejectWithValue(axiosError.response?.data || 'Failed to fetch orders');
     }
   },
 );
@@ -85,15 +87,14 @@ export const updateOrderStatus = createAsyncThunk(
         },
       );
       return response.data;
-    } catch (error: any) {
-      if (error.response && error.response.status === 401) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 401) {
         dispatch(logout());
         dispatch(resetCart());
         dispatch(resetOrders());
       }
-      return rejectWithValue(
-        error.response?.data || 'Failed to update order status',
-      );
+      return rejectWithValue(axiosError.response?.data || 'Failed to fetch orders');
     }
   },
 );

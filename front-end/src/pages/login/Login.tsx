@@ -10,7 +10,7 @@ import {
 } from '../../redux/auth/authSlice';
 import { User } from '../../types/userTypes';
 import LoginIcon from '@mui/icons-material/Login';
-import { fetchCart } from '../../redux/cart/cartSlice';
+import { fetchCart, setLoading } from '../../redux/cart/cartSlice';
 import { fetchOrders } from '../../redux/orders/ordersSlice';
 
 function Login() {
@@ -30,6 +30,7 @@ function Login() {
   useEffect(() => {
     if (!isAuthenticated) {
       dispatch(resetError());
+      dispatch(setLoading(false))
     }
   }, [dispatch, isAuthenticated]);
 
